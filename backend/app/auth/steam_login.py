@@ -1,20 +1,19 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse, JSONResponse
-
-import httpx
 import urllib.parse
 
 router = APIRouter()
 
 STEAM_OPENID_URL = "https://steamcommunity.com/openid/login"
+FRONTEND_URL = "http://localhost:8000" # backend serves frontend work
 
 @router.get("/login")
 def login():
     params = {
         "openid.ns": "http://specs.openid.net/auth/2.0",
         "openid.mode": "checkid_setup",
-        "openid.return_to": "http://localhost:8000/auth/verify",
-        "openid.realm": "http://localhost:8000/",
+        "openid.return_to": f"{FRONTEND_URL}/auth/verify",
+        "openid.realm": FRONTEND_URL,
         "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
         "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
     }
@@ -31,9 +30,9 @@ async def verify(request: Request):
     # "openid.claimed_id":"https://steamcommunity.com/openid/id/[ID]"
     claimed_id = params.get("openid.claimed_id")
     if not claimed_id:
-        return JSONResponse({"success" : False, "error" : "could not find Steam ID"})
+        return RedirectResponse("/?error=steam_id_not_found")
     
     # split the string and extract the [ID]
     steam_id = claimed_id.split('/')[-1]
-    return JSONResponse({"success":True, "steam_id": steam_id})
+    return RedirectResponse(f"/dashboard?steam_id={steam_id}")
     
