@@ -12,12 +12,14 @@ app.mount("/static", StaticFiles(directory="backend/static"), name="static")
 templates = Jinja2Templates(directory="backend/templates")
 
 # routes
-app.include_router(steam_login.router, prefix="/auth", tags=["auth"])
+app.include_router(steam_login.router, prefix="/auth", tags=["auth"]) # login/authentication endpoints
 
+# inital home endpoint
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+# logged in user's dashboard
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request, steam_id: str):
     return templates.TemplateResponse("dashboard.html", {"request": request, "steam_id": steam_id})
