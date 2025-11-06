@@ -1,0 +1,52 @@
+  <head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome to SteamVault</h1>
+      <p>Steam ID: {{ steam_id }}</p>
+      <a class="btn" href="/logout">Logout</a>
+    </div>
+
+
+  <div class="friends-section">
+    <h3>Your Friends</h3>
+    <button id="loadFriends" class="btn">View Friends</button>
+    <ul id="friendsList"></ul>
+  </div>
+
+<script>
+    document.getElementById("loadFriends").addEventListener("click", async () => {
+      const list = document.getElementById("friendsList");
+      list.innerHTML = "<li>Loading...</li>";
+
+      try {
+        const res = await fetch("/app/friends");
+        if (!res.ok) {
+          list.innerHTML = "<li>Failed to load friends</li>";
+          return;
+        }
+
+        const data = await res.json();
+        const friends = data.friendslist?.friends || [];
+
+        if (friends.length === 0) {
+          list.innerHTML = "<li>No friends found (maybe private list)</li>";
+          return;
+        }
+
+        // render the friends
+        list.innerHTML = "";
+        friends.forEach(friend => {
+          const li = document.createElement("li");
+          li.textContent = `Friend Steam ID: ${friend.steamid}`;
+          list.appendChild(li);
+        });
+      } catch (err) {
+        list.innerHTML = `<li>Error: ${err}</li>`;
+      }
+    });
+  </script>
+  </body>
+  </html>
