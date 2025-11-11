@@ -1,116 +1,76 @@
-  # SteamVault
-  personal steam tracker
+# SteamVault
+personal steam tracker
 
-  ## High-level planned architecture
-  **Frontend**
-  - calls api via https -> (Fly.io or Render hosted app) 
+![Python 3.12.7](https://img.shields.io/badge/Python-3.12.7-blue.svg) ![FastAPI](https://img.shields.io/badge/FastAPI-0.119.0-009688.svg?logo=fastapi)
 
-  **Backend**
-  - handles steam API calls
-  - stores data in db
-  - exposes endpoints
-  - automated via Render cron-jobs or github actions
-    - hit `/fetch/daily/` every X hours
+## High-level planned architecture
+**Frontend**
+- calls api via https -> (Fly.io or Render hosted app) 
 
-  **Database**
-  - data snapshots
-  - computed analytics
-  - hosted with backend (any lightweight db)
+**Backend**
+- handles steam API calls
+- stores data in db
+- exposes endpoints
+- automated via Render cron-jobs or github actions
+  - hit `/fetch/daily/` every X hours
 
-  ## Backend planned design
-  ```
-  backend/
-  │
-  ├── app/
-  │   ├── main.py
-  │   ├── routes/
-  │   │   ├── fetch.py        # fetch data via Steam API
-  │   │   ├── analytics.py    # give frontend summaries
-  │   │   └── admin.py        # manual fetch and info
-  │   ├── models/ # 
-  │   │   ├── game.py         # tentative 
-  │   │   ├── snapshot.py     # tentative 
-  │   │   ├── analytics.py    # tentative 
-  │   │   └── base.py         # tentative 
-  │   ├── services/
-  │   │   ├── steam_api.py    # fetch data from Steam API
-  │   │   ├── compute.py      # calculate statistics
-  │   │   └── cron.py         # automation
-  │   └── database.py         # database handling
-  ```
+**Database**
+- data snapshots
+- computed analytics
+- hosted with backend (any lightweight db)
 
-  ## Database schema
-  ### games
-  | Column         | Type     | Description                           |
-  | -------------- | -------- | ------------------------------------- |
-  | `id`           | int (PK) | Auto ID                               |
-  | `appid`        | int      | Steam App ID                          |
-  | `name`         | text     | Game name                             |
-  | `img_icon_url` | text     | Game image URL (for frontend display) |
 
-  ### snapshots
-  | Column                  | Type              | Description              |
-  | ----------------------- | ----------------- | ------------------------ |
-  | `id`                    | int (PK)          | Auto ID                  |
-  | `date`                  | datetime          | When data was fetched    |
-  | `appid`                 | int (FK -> games) | Which game               |
-  | `playtime_forever`      | int               | Total playtime (hours)   |
-  | `last_played`           | datetime          | last_played              |
+## Database schema
+### games
+| Column       | Type     | Description    |
+| ------------ | -------- | -------------- |
+| id           | int (PK) | Auto ID        |
+| appid        | int      | Steam App ID   |
+| name         | text     | Game name      |
+| img_icon_url | text     | Game image URL |
 
-  ### daily_analytics
-  | Column                      | Type     | Description                           |
-  | --------------------------- | -------- | ------------------------------------- |
-  | `date`                      | datetime | Date of snapshot                      |
-  | `total_playtime_today`      | int      | Total playtime added                  |
-  | `games_played_today`        | int      | Count of games with playtime increase |
-  | `top_game_today`            | text     | Game with most new playtime           |
 
-  ### cached_summary
-  | Column       | Type     | Description                         |
-  | ------------ | -------- | ----------------------------------- |
-  | `id`         | int (PK) | Auto ID                             |
-  | `updated_at` | datetime | When last computed                  |
-  | `data`       | JSON     | Cached data blob for `/api/summary` |
+### snapshots
+| Column           | Type     | Description              |
+| ---------------- | -------- | ------------------------ |
+| id               | int (PK) | Auto ID                  |
+| date             | datetime | When snapshot was taken  |
+| appid            | int (FK) | Linked to `games.appid`  |
+| playtime_forever | int      | Total playtime (minutes) |
+| last_played      | datetime | Last played timestamp    |
 
-  ## API Endpoints
+### daily_analytics
+- update this
 
-  `/fetch/daily`
-  - `POST` method automated by cron
-  - fetch games, playtime, achievements, etc..
-  - saves data into `snapshots` and computes daily anayltics
+## API Endpoints
+| Endpoint                      | Method | Description                                             |
+| ----------------------------- | ------ | ------------------------------------------------------  |
+| `/fetch/`                     | GET    | Fetch owned games & update snapshots (`.env` protected) |
+| `/analytics/summary/generate` | POST   | Compute daily summary (admin-protected)                 |
+| `/analytics/summary/latest`   | GET    | Get most recent daily summary                           |
+| `/`                           | GET    | Default route                                           |
 
-  `/api/daily_summary`
-  - return most recent analytics summary
+## Installation
 
-  `/api/top_games`
-  - return top games by lifetime
+**Create virtual environment**
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
 
-  `/api/trends`
-  - return the histortical playtime trend data
+**Install Requirements**
+```bash
+pip install -r requirements.txt
+```
 
-  `/admin/fetch`
-  - manually trigger fetch protected by the `.env` toekn
-
-  ## Installation
-
-  **Create virtual environment**
-  ```bash
-  python -m venv .venv
-  source .venv/bin/activate
-  ```
-
-  **Install Requirements**
-  ```bash
-  pip install -r requirements.txt
-  ```
-
-  **Activate venv**
-  ```bash
-  source .venv/bin/activate
-  ```
-
-  ## Running app
-  **Start Server**
-  ```bash
-  uvicorn main:app --reload --app-dir backend
-  ```
+**Setup Environment**
+Create `.env` file:
+```
+STEAM_API_KEY=your_key
+STEAM_ID=your_id
+ADMIN_TOKEN=your_secret
+```
+**Run app**
+```bash
+uvicorn backend.app.main:app --reload
+```

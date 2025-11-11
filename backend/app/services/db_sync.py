@@ -1,6 +1,6 @@
 # /backend/app/services/db_sync.py
 from backend.app.db.database import SessionLocal
-from backend.app.db.models import Game, Snapshot
+from backend.app.db.models import Game, Snapshot, DailySummary
 from datetime import datetime
 
 def save_game_to_db(game_list: list):

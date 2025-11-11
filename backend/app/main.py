@@ -13,7 +13,7 @@ init_database()
 
 # Setup routers
 app.include_router(fetch.router, prefix="/fetch", tags=["fetch"])
-#app.include_router(analytics.router, prefix="/api", tags=["analytics"])
+app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 #app.include_router(admin.router, prefix="/admin", tags=["admin"])
 
 @app.get("/")
