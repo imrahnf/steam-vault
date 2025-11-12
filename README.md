@@ -80,6 +80,7 @@ STEAM_API_KEY=your_key
 STEAM_ID=your_id
 ADMIN_TOKEN=your_secret
 DATABASE_URL=database_url
+CRON_SECRET=secret_code
 ```
 **Run app**
 ```bash

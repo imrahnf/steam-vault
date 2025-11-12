@@ -23,6 +23,7 @@ app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 async def main():
     return {"message" : "SteamVault API running."}
 
+# keep Render app alive
 @app.post("/cron/ping", dependencies=[Depends(verify_cron_token)])
 async def cron_ping():    
     print("pinged the /cron/ping endpoint [POST]")
