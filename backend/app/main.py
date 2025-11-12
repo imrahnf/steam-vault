@@ -1,8 +1,11 @@
 # /backend/app/main.py
+import os
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException, Depends
 from backend.app.routes import fetch, analytics, admin
 from backend.app.db.database import init_database
+
+from backend.app.security import verify_cron_token
 
 load_dotenv()
 
@@ -20,8 +23,8 @@ app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 async def main():
     return {"message" : "SteamVault API running."}
 
-@app.post("/cron/ping")
-async def cron_ping():
+@app.post("/cron/ping", dependencies=[Depends(verify_cron_token)])
+async def cron_ping():    
     print("pinged the /cron/ping endpoint [POST]")
     return {"status": "ok", "ran": "cron/ping"}
 
