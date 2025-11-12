@@ -108,6 +108,7 @@ def get_latest_summary():
 def get_top_games(period: str, page: int = 1, limit: int = 10):
     cache_key = f"top_games_{period}_{page}_{limit}"
     cached = cache.get_cache(cache_key)
+    print(f"Cache hit for {cache_key}: {bool(cached)}")
     if cached:
         return {"cached": True, **cached}
 
@@ -116,27 +117,23 @@ def get_top_games(period: str, page: int = 1, limit: int = 10):
         now = datetime.now(timezone.utc)
         skip = (page - 1) * limit
 
-        # define period range
+        # Determine start date based on period
         if period == "week":
             start_date = now - timedelta(days=7)
         elif period == "month":
             start_date = now - timedelta(days=30)
-        else:
-            start_date = None  # lifetime
+        else:  # lifetime
+            start_date = None
 
-        if period in ["week", "month"]:
-            S1 = aliased(Snapshot)
-            S2 = aliased(Snapshot)
-
+        if start_date:
+            # Get delta playtime in the period
             subq = (
                 db.query(
-                    S1.appid.label("appid"),
-                    (func.max(S2.playtime_forever) - func.min(S1.playtime_forever)).label("delta_playtime")
+                    Snapshot.appid,
+                    (func.max(Snapshot.playtime_forever) - func.min(Snapshot.playtime_forever)).label("delta_playtime")
                 )
-                .join(S2, S1.appid == S2.appid)
-                .filter(S1.date >= start_date)
-                .filter(S2.date >= start_date)
-                .group_by(S1.appid)
+                .filter(Snapshot.date >= start_date)
+                .group_by(Snapshot.appid)
                 .subquery()
             )
 
@@ -149,8 +146,8 @@ def get_top_games(period: str, page: int = 1, limit: int = 10):
                 .limit(limit)
                 .all()
             )
-
-        else:  # lifetime
+        else:
+            # Lifetime: total playtime for each game
             subq = (
                 db.query(
                     Snapshot.appid,
@@ -170,13 +167,13 @@ def get_top_games(period: str, page: int = 1, limit: int = 10):
                 .all()
             )
 
+        # Format results
         top_games = [
             {"name": r[0], "total_playtime": int(r[1] or 0)}
-            for r in results if r[1] is not None
+            for r in results
         ]
 
         response = {
-            "cached": False,
             "period": period,
             "page": page,
             "limit": limit,
@@ -185,14 +182,14 @@ def get_top_games(period: str, page: int = 1, limit: int = 10):
             "top_games": top_games
         }
 
-        # Cache results for speed
-        ttl = 300 if period in ["week", "month"] else 3600
+        # Cache results
+        ttl = 10 if period in ["week", "month"] else 3600
         cache.set_cache(cache_key, response, ttl=ttl)
 
-        return response
-
+        return {"cacned": False, **response}
     finally:
         db.close()
+
 
 def get_trends():
     cache_key = "playtime_trends"

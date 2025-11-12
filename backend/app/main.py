@@ -19,3 +19,9 @@ app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 @app.get("/")
 async def main():
     return {"message" : "SteamVault API running."}
+
+@app.on_event("startup")
+async def run_fetch():
+    from backend.app.routes.fetch import get_steam_games
+
+    await get_steam_games()
