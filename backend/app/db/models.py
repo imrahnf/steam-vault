@@ -1,7 +1,7 @@
 # /backend/app/db/models.py
 from sqlalchemy import Column, Integer, String, Float, DateTime, Date, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
-from datetime import datetime, date
+from datetime import datetime, timezone, date
 
 Base = declarative_base()
 
@@ -24,7 +24,7 @@ class Snapshot(Base):
 
     # attributes
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(DateTime, default=datetime.now, nullable=False)
+    date = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
     appid = Column(Integer, ForeignKey("games.appid"), nullable=False, index=True)
     playtime_forever = Column(Integer, nullable=False) # minutes
     last_played = Column(DateTime, nullable=True)

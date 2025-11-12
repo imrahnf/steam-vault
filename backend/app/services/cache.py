@@ -14,3 +14,7 @@ def get_cache(key):
         del _cache[key]
         return None
     return data["value"]
+
+def delete_cache(key):
+    if key in _cache:
+        del _cache[key]

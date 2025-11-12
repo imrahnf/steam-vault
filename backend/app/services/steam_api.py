@@ -60,3 +60,28 @@ async def process_owned_games(raw_response: dict):
         })
 
     return {"game_count": len(processed), "games": processed}
+
+async def get_player_summary(steam_id: str):
+    url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/" # ?key=XXXXXXXXXXXXXXXXXXXXXXX&steamids=76561197960435530"
+    params = {"key": STEAM_API_KEY, "steamids": steam_id}
+
+    # get data from Steam API
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(url, params=params)
+        data = resp.json()
+    
+    players = data.get("response", {}).get("players", [])
+    if not players:
+        return None
+    
+    # there exists the player, so return the data
+    p = players[0]
+
+    return {
+        "personaname": p.get("personaname"),
+        "avatar": p.get("avatarfull"),
+        "steamid": p.get("steamid"),
+        "profileurl": p.get("profileurl"),
+        "lastlogoff": p.get("lastlogoff"),
+        "timecreated": p.get("timecreated")
+    }

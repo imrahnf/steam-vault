@@ -7,6 +7,7 @@ import asyncio
 
 from backend.app.services import steam_api, db_sync
 from backend.app.security import verify_admin_token
+from backend.app.services import cache
 
 load_dotenv()
 
@@ -38,3 +39,23 @@ async def get_steam_games():
     print(processed_data["games"][0])
 
     return processed_data
+
+@router.get("/profile")
+async def get_proflie():
+    # fetch cached data
+    cached = cache.get_cache("steam-profile")
+    
+    if cached:
+        return {"cached": True, "profile":cached}
+    
+    try:
+        profile_data = await steam_api.get_player_summary(STEAM_ID)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch profile {e}")
+
+    if not profile_data:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    cache.set_cache("steam-profile", profile_data, 7200) # 2 hr cache
+
+    return {"cached": False, "profile":profile_data}
