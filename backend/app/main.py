@@ -20,6 +20,11 @@ app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 async def main():
     return {"message" : "SteamVault API running."}
 
+@app.post("/cron/ping")
+async def cron_ping():
+    print("pinged the /cron/ping endpoint [POST]")
+    return {"status": "ok", "ran": "cron/ping"}
+
 @app.on_event("startup")
 async def run_fetch():
     from backend.app.routes.fetch import get_steam_games
