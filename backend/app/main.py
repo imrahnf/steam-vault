@@ -32,5 +32,4 @@ async def cron_ping():
 @app.on_event("startup")
 async def run_fetch():
     from backend.app.routes.fetch import get_steam_games
-
     await get_steam_games()
