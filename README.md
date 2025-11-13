@@ -45,6 +45,7 @@ This provides an extensible and production ready analytics service that anyone c
     - [Local Development Setup](#local-development-setup)
       - [1. Clone \& Install](#1-clone--install)
       - [2. Start the API](#2-start-the-api)
+        - [Api Docs (Swagger/ReDoc/OpenAPI)](#api-docs-swaggerredocopenapi)
     - [Mock Data (optional, for testing)](#mock-data-optional-for-testing)
     - [Deployment on Render](#deployment-on-render)
       - [Database Requirements](#database-requirements)
@@ -264,6 +265,26 @@ The API will be running on:
 ```
 http://127.0.0.1:8000
 ```
+
+##### Api Docs (Swagger/ReDoc/OpenAPI)
+By default, SteamVault disables the built in documentation for production in [`/backend/app/main.py`](/backend/app/main.py):
+```python
+app = FastAPI(title="SteamVault", 
+    docs_url=None, 
+    redoc_url=None, 
+    openapi_url=None
+)
+```
+To enable it during local development, update it to:
+```
+app = FastAPI(title="SteamVault")
+```
+Then you can access the docs and test endpoints. Ex:
+- Swagger: `http://127.0.0.1:8000/docs`
+
+> Important:
+> Keep docs disabled in production for security purposes.
+> Only enable them when testing locally.
 
 ---
 
