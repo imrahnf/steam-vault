@@ -186,7 +186,7 @@ def get_top_games(period: str, page: int = 1, limit: int = 10):
         ttl = 10 if period in ["week", "month"] else 3600
         cache.set_cache(cache_key, response, ttl=ttl)
 
-        return {"cacned": False, **response}
+        return {"cached": False, **response}
     finally:
         db.close()
 

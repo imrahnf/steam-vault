@@ -101,7 +101,7 @@ curl -X POST "https://<app-url>.com/analytics/summary/generate" -H "x-token: <YO
 ```
 
 ### Cron Protected Routes
-Used for scheduled tasks like keeping the Render app alive:
+Used for scheduled tasks like keeping the Render app alive; requires `x-token` header with the value of `CRON_SECRET` from `.env`:
 - `/cron/ping/` – keep Render app alive
 
 **Example:**
@@ -112,26 +112,50 @@ curl -X POST "https://<app-url>.com/cron/ping" -H "x-token: YOUR_CRON_SECRET"
 No authentication needed:
 - `/fetch/profile/` – get cached Steam profile info
 - `/analytics/summary/latest/` – get the latest summary
-- `/analytics/top_games/` – top games over week/month/lifetime
 - `/analytics/trends/` – playtime trends
+- `/analytics/top_games/` – get top games over a selected period
+    **Query parameters** (all optional with defaults):
+    - `period` – `"week"`, `"month"`, or `"lifetime"` (default: `"lifetime"`)
+    - `page` – page number for pagination (default: `1`)
+    - `limit` – number of results per page, 1–100 (default: `10`)
+    - Calling `/analytics/top_games/` without parameters will return the default period (`lifetime`), page (`1`), and limit (`10`).
 
 **Example:**
 ```
-curl "https://<app-url>.com/analytics/summary/latest"
+curl -X GET "https://<app-url>.com/analytics/top_games?period=week&page=1&limit=5"
 ```
-##### Example API Response:`/analytics/summary/latest/`
+
+***Example output:***
 ```json
 {
-  "new_games_count": 0,
-  "id": 1,
-  "average_playtime_per_game": 824.28,
-  "most_played_appid": 359550,
-  "most_played_minutes": 12177,
-  "total_playtime_minutes": 100562,
-  "date": "2025-11-13",
-  "total_games_tracked": 122,
-  "total_playtime_change": 100562,
-  "most_played_name": "Tom Clancy's Rainbow Six® Siege X"
+    "cached": false,
+    "period": "week",
+    "page": 1,
+    "limit": 5,
+    "total": 122,
+    "total_pages": 25,
+    "top_games": [
+        {
+            "name": "Left 4 Dead 2",
+            "total_playtime": 500
+        },
+        {
+            "name": "Portal 2",
+            "total_playtime": 498
+        },
+        {
+            "name": "Counter-Strike 2",
+            "total_playtime": 285
+        },
+        {
+            "name": "Garry's Mod",
+            "total_playtime": 113
+        },
+        {
+            "name": "Portal",
+            "total_playtime": 4
+        }
+    ]
 }
 ```
 
