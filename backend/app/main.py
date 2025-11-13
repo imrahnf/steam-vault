@@ -7,6 +7,12 @@ from backend.app.db.database import init_database
 
 from backend.app.security import verify_cron_token
 
+'''
+    TODO: ADD CORS MIDDLEWERE
+    - add local dev frontend origin
+    - add deployed frontend
+'''
+
 load_dotenv()
 
 app = FastAPI(title="SteamVault", docs_url=None, redoc_url=None, openapi_url=None)
