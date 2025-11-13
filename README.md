@@ -10,7 +10,7 @@
 
 ## Tech Stack
 - **Backend:** FastAPI, Python 3.12.7, Gunicorn + Uvicorn
-- **Database:** Supabase PostgreSQL (IPv4 Session Pooler)
+- **Database:** Supabase PostgreSQL (IPv4 Session Pooler, SSL enforced)
 - **Cloud & CI/CD:** Render (auto-deploy from GitHub main branch)
 - **Scheduler:** Google Cloud Scheduler (cron jobs)
 
