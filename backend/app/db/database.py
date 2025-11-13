@@ -8,16 +8,21 @@ from .models import Base
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./steamvault.db")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# required for sqlite when using with multiple threads
-if DATABASE_URL.startswith("sqlite"):
-    connection_args = {"check_same_thread": False} # for sqlite only
+# Fetch database variables
+if not DATABASE_URL:
+    print("Using Supabase URL")
+    USER = os.getenv("user")
+    PASSWORD = os.getenv("password")
+    HOST = os.getenv("host")
+    PORT = os.getenv("port")
+    DBNAME = os.getenv("dbname")
+    DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+else:
+    print("Using SQLite database")
 
-# setup db connection 
-engine = create_engine(DATABASE_URL, connect_args=connection_args, echo=False)
-
-# short db transaction env
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # create tables for dev if missing
