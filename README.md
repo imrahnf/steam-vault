@@ -166,7 +166,8 @@ curl -X GET "https://<app-url>.com/analytics/top_games?period=week&page=1&limit=
 ```bash
 # Create virtual environment
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate 
+# If on Windows: '.venv\Scripts\activate'
 
 # Install dependencies
 pip install -r requirements.txt
@@ -175,6 +176,16 @@ pip install -r requirements.txt
 uvicorn backend.app.main:app --reload
 ```
 
+### Installation Notes
+
+>**Windows users:** The `uvloop` package is Unix-only and will not work.  
+>If you are installing on Windows, it will be skipped automatically when using the provided `requirements.txt`.  
+>On **Unix systems**, `uvloop` will be installed and can improve performance.
+
+`requirements.txt` includes a platform marker:
+```
+uvloop==0.22.1; sys_platform != "win32"
+```
 ### Environment Variables
 Set these in `.env` for **local testing** or in Render's dashboard for **production**:
 ```
