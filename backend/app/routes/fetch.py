@@ -40,7 +40,7 @@ async def get_steam_games():
 
     return processed_data
 
-@router.get("/profile", dependencies=[Depends(verify_admin_token)])
+@router.get("/profile")
 async def get_proflie():
     # fetch cached data
     cached = cache.get_cache("steam-profile")
