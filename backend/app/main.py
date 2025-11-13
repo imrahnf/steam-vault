@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException, Depends
 
 from backend.app.routes import fetch, analytics
-from backend.app.routes import analytics_extra, games
+from backend.app.routes import games
 
 from backend.app.db.database import init_database
 from backend.app.security import verify_cron_token
@@ -26,7 +26,6 @@ init_database()
 app.include_router(fetch.router, prefix="/fetch", tags=["fetch"])
 app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 
-app.include_router(analytics_extra.router, prefix="/analytics", tags=["analytics_extra"])
 app.include_router(games.router, prefix="/games", tags=["games"])
 
 @app.get("/")
