@@ -299,6 +299,8 @@ Then you can access the docs and test endpoints. Ex:
     ```
     SQLite database (`steamvault.db`) will be generated.
 
+---
+
 ### Deployment on Render
 > **Recommended free setup**: Render free tier for hosting + Supabase free tier (IPv4 session pooler) for database. This combination provides a fully functional backend without cost.
 1. Push your repo to GitHub.
