@@ -10,9 +10,12 @@ from backend.app.db.database import init_database
 from backend.app.security import verify_cron_token
 
 '''
-    TODO: ADD CORS MIDDLEWERE
-    - add local dev frontend origin
-    - add deployed frontend
+    TODO: 
+    - ADD CORS MIDDLEWERE
+        add local dev frontend origin
+        add deployed frontend
+    
+    - DEVELOP FRONTEND
 '''
 
 load_dotenv()

@@ -15,12 +15,13 @@ from collections import defaultdict
 import os
 import sys
 
+
 # ensure project root is on path
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from backend.app.db.database import SessionLocal
+from backend.app.db.database import SessionLocal, engine, Base
 from backend.app.db.models import Game, Snapshot, DailySummary
 
 # ----------------------------------------------------------
@@ -170,6 +171,8 @@ def compute_and_insert_daily_summary_for_date(db, target_date):
     return summary
 
 def main():
+    print("[+] Ensuring tables exist...")
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         anchor_date = get_anchor_day(db)
@@ -264,4 +267,9 @@ def main():
         db.close()
 
 if __name__ == "__main__":
+    # ensure project root is on path
+    ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+
     main()
