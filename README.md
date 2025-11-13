@@ -72,16 +72,16 @@ steam-vault/
 | Endpoint                      | Method | Description                                                          |
 | ----------------------------- | ------ | -------------------------------------------------------------------- |
 | `/fetch/`                     | GET    | Fetch owned games from Steam and update snapshots (`.env` protected) |
-| `/fetch/profile`              | GET    | Get Steam profile info (cached)                                      |
-| `/analytics/summary/generate` | POST   | Compute daily summary (`.env` protected)                             |
-| `/analytics/summary/latest`   | GET    | Get the most recent daily summary                                    |
-| `/analytics/top_games`        | GET    | Get top games over week, month, or lifetime                          |
-| `/analytics/trends`           | GET    | Get playtime trends over the last two weeks                          |
+| `/fetch/profile/`             | GET    | Get Steam profile info (cached)                                      |
+| `/analytics/summary/generate/`| POST   | Compute daily summary (`.env` protected)                             |
+| `/analytics/summary/latest/`  | GET    | Get the most recent daily summary                                    |
+| `/analytics/top_games/`       | GET    | Get top games over week, month, or lifetime                          |
+| `/analytics/trends/`          | GET    | Get playtime trends over the last two weeks                          |
 | `/`                           | GET    | Default route to check API status                                    |
-| `/cron/ping`                  | POST   | Keep Render app alive (used by cron)                                 |
+| `/cron/ping/`                 | POST   | Keep Render app alive (used by cron)                                 |
 
 #### Example API Response
-- **(GET)** `/analytics/summary/latest`
+- **(GET)** `/analytics/summary/latest/`
 ```json
 {
   "new_games_count": 0,
@@ -126,11 +126,13 @@ password=XXXXXXXXXX
 host=XXXXXXXXXX
 port=XXXX
 dbname=postgres
+# Make sure SSL is enabled in Supabase settings: Database → Settings → SSL Configuration → Enforce SSL on incoming connections
 ```
 
 If preferred, you can define a full database url with:
 ```
-DATABASE_URL=database_url
+# Example:
+DATABASE_URL=postgresql://postgres:password@aws-1-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require
 ```
 [database.py](backend/app/db/database.py) will **automatically** use this if explicitly defined.
 
@@ -148,6 +150,8 @@ pip install -r requirements.txt
 ```
 gunicorn -k uvicorn.workers.UvicornWorker backend.app.main:app --bind 0.0.0.0:8000
 ```
+If you want Render to assign the port **automatically**, set `8000` to `$PORT`
+
 7. Deploy and monitor logs. The app should start and hit the `/` endpoint with:
 ```json
 {"message": "SteamVault API running."}
