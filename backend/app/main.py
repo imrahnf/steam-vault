@@ -48,7 +48,7 @@ async def cron_ping():
 async def run_fetch():
     # Include demo routes if demo mode OR demo docs is active
     if DEMO_MODE or SHOW_DEMO_DOCS:
-        app.include_router(demo_router, prefix="/demo", tags=["demo"])
+        app.include_router(demo_router, tags=["demo"])
         print("[DEMO ROUTES ENABLED]")
 
     # Production (real) routes only when not demo mode
