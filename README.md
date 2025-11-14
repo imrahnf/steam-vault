@@ -23,11 +23,15 @@ cd steam-vault
 python -m venv .venv
 
 source .venv/bin/activate # MacOS/Linux
-# or 
+# OR
 .venv\Scripts\activate # Windows
 
 pip install -r requirements.txt
-cp .env.example .env
+
+cp .env.example .env # MacOS/Linux
+# OR
+copy .env.example .env # Windows
+
 uvicorn backend.app.main:app --reload
 # Visit http://127.0.0.1:8000/docs
 ```
