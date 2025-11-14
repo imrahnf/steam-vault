@@ -1,5 +1,5 @@
 # SteamVault
-![Python 3.12.7](https://img.shields.io/badge/Python-3.12.7-blue.svg) ![FastAPI](https://img.shields.io/badge/FastAPI-0.119.0-009688.svg?logo=fastapi)![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)![Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?logo=render)
+![Python 3.12.7](https://img.shields.io/badge/Python-3.12.7-blue.svg) ![FastAPI](https://img.shields.io/badge/FastAPI-0.119.0-009688.svg?logo=fastapi) ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) ![Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?logo=render)
 
 > **SteamVault** is a modular **backend analytics engine** and **REST API** that automatically tracks your Steam gaming activity.  
 It fetches daily playtime, stores historical snapshots, and generates rich analytics such as:
