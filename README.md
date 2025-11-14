@@ -3,13 +3,13 @@
 
 > **SteamVault** is a modular **backend analytics engine** and **REST API** that automatically tracks your Steam gaming activity.  
 It fetches daily playtime, stores historical snapshots, and generates rich analytics such as:
-- Daily summaries  
-- Weekly/monthly top games  
-- 14-day playtime trends  
-- Streak detection  
-- Activity heatmaps  
-- Per-game history previews  
-- Multi-game comparisons  
+- Daily summaries.
+- Weekly/monthly top games.
+- 14-day playtime trends.  
+- Streak detection.  
+- Activity heatmaps.  
+- Per-game history previews.  
+- Multi-game comparisons.  
 
 SteamVault is **backend only by design**.  
 You can interact with it through HTTP clients (Postman, curl) or connect any frontend/dashboard you prefer.
@@ -49,7 +49,7 @@ This provides an extensible and production ready analytics service that anyone c
     - [Local Development Setup](#local-development-setup)
       - [1. Clone \& Install](#1-clone--install)
       - [2. Start the API](#2-start-the-api)
-        - [Api Docs (Swagger/ReDoc/OpenAPI)](#api-docs-swaggerredocopenapi)
+        - [API Docs (Swagger/ReDoc/OpenAPI)](#api-docs-swaggerredocopenapi)
     - [Mock Data (optional, for testing)](#mock-data-optional-for-testing)
     - [Deployment on Render](#deployment-on-render)
       - [Database Requirements](#database-requirements)
@@ -61,21 +61,21 @@ This provides an extensible and production ready analytics service that anyone c
 
 ### ⭐ Why SteamVault?
 Steam shows lifetime playtime, but offers no **historical records** or analytics. SteamVault fills this gap by generating daily snapshots and summaries, enabling:
-- Daily snapshots
-- Daily summaries
-- Trends and top games
-- Streaks and activity heatmaps
-- Game comparisons over time
+- Daily snapshots.
+- Daily summaries.
+- Trends and top games.
+- Streaks and activity heatmaps.
+- Game comparisons over time.
 
 ---
 
 ### Key Features
-- Fetch Steam library + playtime automatically
-- Generate daily summaries and analytics
-- Weekly/monthly/lifetime top games
-- Trends across the last 14 days
-- Per-game history previews and comparisons
-- Activity heatmap (day-by-day)
+- Fetch Steam library + playtime automatically.
+- Generate daily summaries and analytics.
+- Weekly/monthly/lifetime top games.
+- Trends across the last 14 days.
+- Per-game history previews and comparisons.
+- Activity heatmap (day-by-day).
 
 > The project is designed to be modular: while the recommended free setup uses **Supabase PostgreSQL (IPv4 session pooler)** and **Render** for hosting, it can be easily adapted to other Postgres databases or deployment platforms. This is just a general reference setup and the app can be configured to work with any PostgreSQL-compatible database or hosting platform.
 
@@ -203,13 +203,13 @@ SteamVault includes a **fully isolated demo environment** that exposes read only
 This is useful when you want to publicly showcase the API without exposing real Steam data.
 
 ### How Demo Mode Works
-- The demo routes live under the prefix `/demo`
+- The demo routes live under the prefix `/demo`.
 - This uses a completely separate database defined in [`backend/app/db/demo_database.py`](backend/app/db/demo_database.py):
   ```python
   DATABASE_URL = "sqlite:///./steamvault_demo.db"
   ```
-- A single `demo_session` is created per process
-- No writing occurs; all endpoints are readonly
+- A single `demo_session` is created per process.
+- No writing occurs; all endpoints are readonly.
 - If you do not need this, simply delete the demo router import as well as the demo database file.
 
 ### Enabling Demo Endpoints
@@ -219,8 +219,7 @@ In [`backend/app/main.py`](backend/app/main.py), demo mode is enabled by these l
 from backend.app.routes.demo.demo_routes import demo_router 
 app.include_router(demo_router)
 ```
-To disable demo mode for production, remove these lines.
-
+To disable demo mode for production, **remove these lines**.
 
 ### Demo Routes (`/demo/*`)
 | Endpoint                           | Method | Description                            |
@@ -261,8 +260,8 @@ DATABASE_URL=sqlite:///./steamvault.db
 - **STEAM_API_KEY** — https://steamcommunity.com/dev/apikey
 - **STEAM_ID** — https://steamid.io/
 - **ADMIN_TOKEN** / **CRON_SECRET**
-  - Use any random string. For ex:
-    - Open terminal and type `openssl rand -hex 32`
+  - Use any random string
+    - e.g: Open terminal and type `openssl rand -hex 32`
 > **ADMIN_TOKEN** & **CRON_SECRET** are **not provided by the project**. You **must generate your own** secrets.
 
 **DATABASE_URL rules**
@@ -309,7 +308,7 @@ The API will be running on:
 http://127.0.0.1:8000
 ```
 
-##### Api Docs (Swagger/ReDoc/OpenAPI)
+##### API Docs (Swagger/ReDoc/OpenAPI)
 By default, SteamVault disables the built in documentation for production in [`/backend/app/main.py`](/backend/app/main.py):
 ```python
 app = FastAPI(title="SteamVault", 
@@ -322,7 +321,7 @@ To enable it during local development, update it to:
 ```
 app = FastAPI(title="SteamVault")
 ```
-Then you can access the docs and test endpoints. Ex:
+Then you can access the docs and test endpoints. E.g:
 - Swagger: `http://127.0.0.1:8000/docs`
 
 > Important:
@@ -361,8 +360,8 @@ Then you can access the docs and test endpoints. Ex:
 
 #### Database Requirements
 If using Supabase:
-- Enable **IPv4 session pooler**
-- Enable **SSL required**
+- Enable **IPv4 session pooler**.
+- Enable **SSL required**.
 
 ---
 
@@ -378,9 +377,9 @@ If using Supabase:
 ---
 
 ## Extending SteamVault
-- Swap PostgreSQL for any other compatible database
-- Deploy on other cloud platforms with minimal changes
-- Frontend is fully decoupled; add frontend anytime
+- Swap PostgreSQL for any other compatible database.
+- Deploy on other cloud platforms with minimal changes.
+- Frontend is fully decoupled; add frontend anytime.
 
 ---
 

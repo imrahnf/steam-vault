@@ -14,7 +14,6 @@ from backend.app.routes.demo.demo_routes import demo_router
     - ADD CORS MIDDLEWERE
         add local dev frontend origin
         add deployed frontend
-    
     - DEVELOP FRONTEND
 '''
 
@@ -25,13 +24,13 @@ app = FastAPI(title="SteamVault")#, docs_url=None, redoc_url=None, openapi_url=N
 # Initialize db
 init_database()
 
-# Setup routers
-app.include_router(fetch.router, prefix="/fetch", tags=["fetch"])
-app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
-app.include_router(games.router, prefix="/games", tags=["games"])
-
 # Demo routes only (delete)
 app.include_router(demo_router)
+
+# Setup production routers
+app.include_router(fetch.router, prefix="/fetch", tags=["fetch"], include_in_schema=False)
+app.include_router(analytics.router, prefix="/analytics", tags=["analytics"], include_in_schema=False)
+app.include_router(games.router, prefix="/games", tags=["games"], include_in_schema=False)
 
 @app.get("/")
 async def main():
