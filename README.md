@@ -82,11 +82,11 @@ Steam shows lifetime playtime, but offers no **historical records** or analytics
 ---
 
 ## Tech Stack
-- **Backend:** FastAPI, Python 3.12.7, Gunicorn + Uvicorn
-- **Database:** Supabase PostgreSQL (IPv4 Session Pooler, SSL enforced)
-- **Cloud & CI/CD:** Render (auto-deploy from GitHub main branch)
-- **Scheduler:** Google Cloud Scheduler (cron jobs)
-- **Frontend:** Not yet implemented (API only, fully decoupled)
+- **Backend:** FastAPI, Python 3.12.7, Gunicorn + Uvicorn.
+- **Database:** Supabase PostgreSQL (IPv4 Session Pooler, SSL enforced).
+- **Cloud & CI/CD:** Render (auto-deploy from GitHub main branch).
+- **Scheduler:** Google Cloud Scheduler (cron jobs).
+- **Frontend:** Not yet implemented (API only, fully decoupled).
 > A small in-memory caching layer reduces redundant Steam API calls. See [backend/app/services/cache.py](backend/app/services/cache.py) for more info.
 
 ---
@@ -101,10 +101,10 @@ steam-vault/
 │   │   └── main.py                  # FastAPI entrypoint
 │   │   └── security.py              # Authorize internal endpoint calls
 │   ├── scripts/
-│   │   ├── generate_mock_history.py # Explained later
+│   │   └── generate_mock_history.py # Explained later
 ├── requirements.txt
-└── README.md
 └── steamvault.db                    # (Optional) Explained later
+└── steamvault_demo.db               # (Optional) Explained later
 ```
 
 ---
@@ -257,8 +257,8 @@ DATABASE_URL=sqlite:///./steamvault.db
 ```
 #### Notes
 **How do I get these keys and security tokens?**
-- **STEAM_API_KEY** — https://steamcommunity.com/dev/apikey
-- **STEAM_ID** — https://steamid.io/
+- **STEAM_API_KEY** — https://steamcommunity.com/dev/apikey.
+- **STEAM_ID** — https://steamid.io/.
 - **ADMIN_TOKEN** / **CRON_SECRET**
   - Use any random string
     - e.g: Open terminal and type `openssl rand -hex 32`
@@ -324,9 +324,9 @@ app = FastAPI(title="SteamVault")
 Then you can access the docs and test endpoints. E.g:
 - Swagger: `http://127.0.0.1:8000/docs`
 
-> Important:
+> **Important**:
 > Keep docs disabled in production for security purposes.
-> Only enable them when testing locally.
+> *Only enable them when testing locally.*
 
 ---
 
