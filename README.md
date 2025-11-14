@@ -11,15 +11,31 @@ It fetches daily playtime, stores historical snapshots, and generates rich analy
 - Per-game history previews.  
 - Multi-game comparisons.  
 
-SteamVault is **backend only by design**.  
-You can interact with it through HTTP clients (Postman, curl) or connect any frontend/dashboard you prefer.
+> SteamVault is **backend-only by design**. There is **no official frontend** yet, but any dashboard can be plugged in.
 
 This provides an extensible and production ready analytics service that anyone can build on.
 
 ---
+# Quick Start (Demo Mode)
+```bash
+git clone https://github.com/imrahnf/steam-vault
+cd steam-vault
+python -m venv .venv
+
+source .venv/bin/activate # MacOS/Linux
+# or 
+.venv\Scripts\activate # Windows
+
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn backend.app.main:app --reload
+# Visit http://127.0.0.1:8000/docs
+```
+---
 
 # Table of Contents
 - [SteamVault](#steamvault)
+- [Quick Start (Demo Mode)](#quick-start-demo-mode)
 - [Table of Contents](#table-of-contents)
     - [⭐ Why SteamVault?](#-why-steamvault)
     - [Key Features](#key-features)
@@ -39,8 +55,8 @@ This provides an extensible and production ready analytics service that anyone c
     - [Cron Protected Routes](#cron-protected-routes)
     - [Public Endpoints](#public-endpoints)
   - [Demo Mode (Optional)](#demo-mode-optional)
-    - [How Demo Mode Works](#how-demo-mode-works)
-    - [Enabling Demo Endpoints](#enabling-demo-endpoints)
+    - [What Demo Mode Does](#what-demo-mode-does)
+    - [Demo Database](#demo-database)
     - [Demo Routes (`/demo/*`)](#demo-routes-demo)
   - [Installation \& Deployment](#installation--deployment)
     - [Environment Variables](#environment-variables)
@@ -49,7 +65,8 @@ This provides an extensible and production ready analytics service that anyone c
     - [Local Development Setup](#local-development-setup)
       - [1. Clone \& Install](#1-clone--install)
       - [2. Start the API](#2-start-the-api)
-        - [API Docs (Swagger/ReDoc/OpenAPI)](#api-docs-swaggerredocopenapi)
+      - [API Docs (Swagger/ReDoc/OpenAPI)](#api-docs-swaggerredocopenapi)
+      - [To **show docs**, replace this in `main.py`:](#to-show-docs-replace-this-in-mainpy)
     - [Mock Data (optional, for testing)](#mock-data-optional-for-testing)
     - [Deployment on Render](#deployment-on-render)
       - [Database Requirements](#database-requirements)
@@ -197,29 +214,35 @@ Accessible without any tokens- fully public:
 - `/analytics/games/compare`
 - `/games/*`
 
+---
+
 ## Demo Mode (Optional)
-SteamVault includes a **fully isolated demo environment** that exposes read only analytics using a separate SQLite database, found in [`/steamvault_demo.db`](/steamvault_demo.db)
-
-This is useful when you want to publicly showcase the API without exposing real Steam data.
-
-### How Demo Mode Works
-- The demo routes live under the prefix `/demo`.
-- This uses a completely separate database defined in [`backend/app/db/demo_database.py`](backend/app/db/demo_database.py):
-  ```python
-  DATABASE_URL = "sqlite:///./steamvault_demo.db"
-  ```
-- A single `demo_session` is created per process.
-- No writing occurs; all endpoints are readonly.
-- If you do not need this, simply delete the demo router import as well as the demo database file.
-
-### Enabling Demo Endpoints
-In [`backend/app/main.py`](backend/app/main.py), demo mode is enabled by these lines:
-```python
-# DELETE THIS, demo purposes only
-from backend.app.routes.demo.demo_routes import demo_router 
-app.include_router(demo_router)
+SteamVault includes a **fully isolated demo environment** that exposes read only analytics using a separate SQLite database, controlled with the `.env` variable:
+```ini
+DEMO_MODE=1
 ```
-To disable demo mode for production, **remove these lines**.
+
+### What Demo Mode Does
+When `DEMO_MODE=1`:
+- The API **does NOT hit the real Steam API**
+- The API **does NOT run fetch or write operations**
+- The API uses `steamvault_demo.db`, which ships with the repository
+  - No database initialization required
+- Only demo endpoints (`/demo/*`) are enabled
+- API documentation (Swagger/ReDoc/OpenAPI) is automatically **enabled**
+
+> In `DEMO_MODE=1`, the API switches to demo-only mode using `steamvault_demo.db`, and only `/demo/*` routes are registered. Regular production routes (`/fetch`, `/analytics/*`, `/games/*`) are disabled.
+> 
+> **Note**: API documentation is enabled automatically in `DEMO_MODE`, but can also be enabled separately using `SHOW_DEMO_DOCS=1`.
+
+
+
+### Demo Database
+The repo includes:
+```
+steamvault_demo.db
+```
+This database contains pre generated example game histories, allowing users to explore analytics **without connecting their Steam account**.
 
 ### Demo Routes (`/demo/*`)
 | Endpoint                           | Method | Description                            |
@@ -242,18 +265,21 @@ Before running SteamVault, create an `.env` file in the root of the project.
 ### Environment Variables
 #### Required Variables
 ```bash
-# Steam API
+# Demo + Docs
+DEMO_MODE=0          # 1 = use demo database + enable /demo routes
+SHOW_DEMO_DOCS=0      # 1 = expose demo Swagger/ReDoc even if DEMO_MODE=0
+
+# Steam API (ignored in DEMO_MODE=1)
 STEAM_API_KEY=YOUR_STEAM_API_KEY
 STEAM_ID=YOUR_STEAM_64_ID
 
-# Security tokens
+# Internal security tokens
 ADMIN_TOKEN=GENERATE_A_RANDOM_SECRET
 CRON_SECRET=GENERATE_A_DIFFERENT_SECRET
 
-# Database (pick one)
-DATABASE_URL=   # Full PostgresSQL URL
-# or, for SQLite development:
-DATABASE_URL=sqlite:///./steamvault.db
+# Database
+# Only used when DEMO_MODE=0
+DATABASE_URL=sqlite:///./steamvault.db  
 ```
 #### Notes
 **How do I get these keys and security tokens?**
@@ -308,25 +334,27 @@ The API will be running on:
 http://127.0.0.1:8000
 ```
 
-##### API Docs (Swagger/ReDoc/OpenAPI)
-By default, SteamVault disables the built in documentation for production in [`/backend/app/main.py`](/backend/app/main.py):
+#### API Docs (Swagger/ReDoc/OpenAPI)
+SteamVault controls documentation visibility and routing separately:
+- Documentation visibility is controlled by `DEMO_MODE`, `SHOW_DEMO_DOCS`, and [/backend/app/main.py](/backend/app/main.py)
+**Production deploys should always keep both disabled.**
+
+| Variable           | Effect                                                 |
+| ------------------ | ------------------------------------------------------ |
+| `DEMO_MODE=1`      | Enables demo DB AND automatically **enables API docs** |
+| `SHOW_DEMO_DOCS=1` | **Allows demo API docs** even when `DEMO_MODE=0`                |
+
+
+**Production deploys should always keep both disabled.**
+
+#### To **show docs**, replace this in [`main.py`](/backend/app/main.py):
 ```python
-app = FastAPI(title="SteamVault", 
-    docs_url=None, 
-    redoc_url=None, 
-    openapi_url=None
-)
+app = FastAPI(title="SteamVault",docs_url=None,redoc_url=None,openapi_url=None)
 ```
-To enable it during local development, update it to:
-```
+with:
+```python
 app = FastAPI(title="SteamVault")
 ```
-Then you can access the docs and test endpoints. E.g:
-- Swagger: `http://127.0.0.1:8000/docs`
-
-> **Important**:
-> Keep docs disabled in production for security purposes.
-> *Only enable them when testing locally.*
 
 ---
 

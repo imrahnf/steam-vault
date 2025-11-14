@@ -18,19 +18,20 @@ from backend.app.routes.demo.demo_routes import demo_router
 '''
 
 load_dotenv()
+DEMO_MODE = os.getenv("DEMO_MODE", "0") == "1"
+SHOW_DEMO_DOCS = os.getenv("SHOW_DEMO_DOCS", "0") == "1"
 
-app = FastAPI(title="SteamVault")#, docs_url=None, redoc_url=None, openapi_url=None)
+# Docs visibility logic
+if DEMO_MODE or SHOW_DEMO_DOCS:
+    # Enable docs
+    app = FastAPI(title="SteamVault")
+else:
+    # Disable all docs
+    app = FastAPI(title="SteamVault",docs_url=None,redoc_url=None,openapi_url=None)
+
 
 # Initialize db
 init_database()
-
-# Demo routes only (delete)
-app.include_router(demo_router)
-
-# Setup production routers
-app.include_router(fetch.router, prefix="/fetch", tags=["fetch"], include_in_schema=False)
-app.include_router(analytics.router, prefix="/analytics", tags=["analytics"], include_in_schema=False)
-app.include_router(games.router, prefix="/games", tags=["games"], include_in_schema=False)
 
 @app.get("/")
 async def main():
@@ -42,7 +43,18 @@ async def cron_ping():
     print("pinged the /cron/ping endpoint [POST]")
     return {"status": "ok", "ran": "cron/ping"}
 
+# Startup event
 @app.on_event("startup")
 async def run_fetch():
-    from backend.app.routes.fetch import get_steam_games
-    await get_steam_games()
+    # Include demo routes if demo mode OR demo docs is active
+    if DEMO_MODE or SHOW_DEMO_DOCS:
+        app.include_router(demo_router, prefix="/demo", tags=["demo"])
+        print("[DEMO ROUTES ENABLED]")
+
+    # Production (real) routes only when not demo mode
+    if not DEMO_MODE:
+        app.include_router(fetch.router, prefix="/fetch", tags=["fetch"], include_in_schema=False)
+        app.include_router(analytics.router, prefix="/analytics", tags=["analytics"], include_in_schema=False)
+        app.include_router(games.router, prefix="/games", tags=["games"], include_in_schema=False)
+        from backend.app.routes.fetch import get_steam_games
+        await get_steam_games()

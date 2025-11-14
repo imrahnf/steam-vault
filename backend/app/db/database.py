@@ -1,35 +1,34 @@
-# /backend/app/db/database.py
-from dotenv import load_dotenv
+# backend/app/db/database.py
 import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from .models import Base
 
 load_dotenv()
+DEMO_MODE = os.getenv("DEMO_MODE", "0") == "1"
 
-# Fetch variables
-USER = os.getenv("user")
-PASSWORD = os.getenv("password")
-HOST = os.getenv("host")
-PORT = os.getenv("port")
-DBNAME = os.getenv("dbname")
-
-# Fetch database variables
-if all([USER, PASSWORD, HOST, PORT, DBNAME]):
-    print("Using Supabase Postgres")
-    # Construct the SQLAlchemy connection string
-    DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+if DEMO_MODE:
+    print("Using demo SQLite database")
+    DATABASE_URL = "sqlite:///./steamvault_demo.db"
 else:
-    print("Using local SQLite database")
-    DATABASE_URL = "sqlite:///./steamvault.db"
+    USER = os.getenv("user")
+    PASSWORD = os.getenv("password")
+    HOST = os.getenv("host")
+    PORT = os.getenv("port")
+    DBNAME = os.getenv("dbname")
 
-# Uncomment for data showcasing or testing:
-# DATABASE_URL = "sqlite:///./steamvault.db"
+    if all([USER, PASSWORD, HOST, PORT, DBNAME]):
+        print("Using Supabase Postgres")
+        DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+    else:
+        print("Using local SQLite database")
+        DATABASE_URL = "sqlite:///./steamvault.db"
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# create tables for dev if missing
+# Initialize production DB if not demo
 def init_database():
-    Base.metadata.create_all(bind=engine)
+    if not DEMO_MODE:
+        Base.metadata.create_all(bind=engine)
