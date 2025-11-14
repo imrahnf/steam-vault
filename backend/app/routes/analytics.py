@@ -43,9 +43,6 @@ async def get_trends():
         raise HTTPException(status_code=404, detail="Not enough data to show trends")
     return result
 
-# ------------------------
-# 1. Daily summaries history
-# ------------------------
 @router.get("/summary/history")
 async def summary_history( start_date: Optional[date] = None, end_date: Optional[date] = None, limit: int = 90 ):
     summary = analytics.summary_history(start_date, end_date, limit)
@@ -53,9 +50,6 @@ async def summary_history( start_date: Optional[date] = None, end_date: Optional
         raise HTTPException(status_code=404, detail="No data available to compute today's summary.")
     return summary
 
-# ------------------------
-# 2. Streaks
-# ------------------------
 @router.get("/streaks")
 async def streaks(appid: Optional[int] = None):
     streak = analytics.get_streaks(appid)
@@ -63,9 +57,6 @@ async def streaks(appid: Optional[int] = None):
         raise HTTPException(status_code=404, detail="No data available to fetch streak.")
     return streak
 
-# ------------------------
-# 3. Activity heatmap
-# ------------------------
 @router.get("/activity/heatmap")
 async def activity_heatmap(limit_days: int = 90):
     acitvity = analytics.activity_heatmap(limit_days)
@@ -73,9 +64,6 @@ async def activity_heatmap(limit_days: int = 90):
         raise HTTPException(status_code=404, detail="Not enough data available to see activity.")
     return acitvity
 
-# ------------------------
-# 4. Compare multiple games (date-aligned)
-# ------------------------
 @router.get("/games/compare")
 async def compare_games( appids: List[int] = Query(...), start_date: Optional[date] = None, end_date: Optional[date] = None):
     comparison = analytics.compare_games(appids, start_date, end_date)
