@@ -366,11 +366,11 @@ If using Supabase:
 ---
 
 ### Cron Jobs / Scheduled Tasks
-| Job Name             | Frequency        | Target Endpoint               | Purpose                           |
-| -------------------- | ---------------- | ----------------------------- | --------------------------------- |
-| `steamvault-fetch`   | Every 15 minutes | `/fetch/`                     | Fetch latest Steam data           |
-| `steamvault-ping`    | Every 5 minutes  | `/cron/ping`                  | Keep Render app alive             |
-| `steamvault-summary` | Daily at 1:00 AM | `/analytics/summary/generate` | Generate daily playtime summaries |
+| Job Name             | Frequency            | Target Endpoint               | Purpose                           |
+| -------------------- | -------------------- | ----------------------------- | --------------------------------- |
+| `steamvault-fetch`   | Every 15 minutes     | `/fetch/`                     | Fetch latest Steam data           |
+| `steamvault-ping`    | Every 5 minutes      | `/cron/ping`                  | Keep Render app alive             |
+| `steamvault-summary` | Daily at 1:00 AM EST | `/analytics/summary/generate` | Generate daily playtime summaries |
 
 > Google Cloud Scheduler, GitHub Actions, or any external cron service works.
 
