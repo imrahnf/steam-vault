@@ -94,26 +94,40 @@ def compute_daily_summary():
     finally:
         db.close()
 
-def get_latest_summary():
-    cache_key = "daily-summary-latest"
+def get_latest_summary(session=None):
+    db = session or SessionLocal() # fallback to main db
+    close_after = False
+    if session is None:
+        close_after = True # only close if we created it ourselves
+    
+    # check cache, use different cache key for demo
+    prefix = "demo-" if session else ""
+    cache_key = f"{prefix}daily-summary-latest"
+
     cached = cache.get_cache(cache_key)
     if cached:
         return {"cached": True, "summary": cached}
 
-    db = SessionLocal()
     try:
         return db.query(DailySummary).order_by(DailySummary.date.desc()).first()
     finally:
-        db.close()
+        if close_after:
+            db.close()
 
-def get_top_games(period: str, page: int = 1, limit: int = 10):
-    cache_key = f"top_games_{period}_{page}_{limit}"
+def get_top_games(period: str, page: int = 1, limit: int = 10, session=None):
+    db = session or SessionLocal()
+    close_after = False
+    if session is None:
+        close_after = True
+
+    prefix = "demo-" if session else ""
+    cache_key = f"{prefix}top_games_{period}_{page}_{limit}"
+    
     cached = cache.get_cache(cache_key)
     print(f"Cache hit for {cache_key}: {bool(cached)}")
     if cached:
         return {"cached": True, **cached}
 
-    db = SessionLocal()
     try:
         now = datetime.now(timezone.utc)
         skip = (page - 1) * limit
@@ -189,15 +203,22 @@ def get_top_games(period: str, page: int = 1, limit: int = 10):
 
         return {"cached": False, **response}
     finally:
-        db.close()
+        if close_after:
+            db.close()
 
-def get_trends():
-    cache_key = "playtime_trends"
+def get_trends(session=None):
+    db = session or SessionLocal()
+    close_after = False
+    if session is None:
+        close_after = True
+
+    prefix = "demo-" if session else ""
+    cache_key = f"{prefix}playtime_trends"
+
     cached = cache.get_cache(cache_key)
     if cached:
         return {"cached": True, "trends": cached}
 
-    db = SessionLocal()
     try:
         now = date.today()
         week_ago = now - timedelta(days=7)
@@ -223,13 +244,20 @@ def get_trends():
         cache.set_cache(cache_key, trends, ttl=1800) # 30 mins cache
         return {"cached": False, "trends": trends}
     finally:
-        db.close()
+        if close_after:
+            db.close()
 
 def summary_history(
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
-    limit: int = 90):
-    db = SessionLocal()
+    limit: int = 90,
+    session=None
+    ):
+    db = session or SessionLocal() # fallback to main db
+    close_after = False
+    if session is None:
+        close_after = True # only close if we created it ourselves
+    
     try:
         query = db.query(DailySummary).order_by(DailySummary.date.desc())
         if start_date:
@@ -237,12 +265,30 @@ def summary_history(
         if end_date:
             query = query.filter(DailySummary.date <= end_date)
         summaries = query.limit(limit).all()
-        return [s.__dict__ for s in reversed(summaries)]
-    finally:
-        db.close()
 
-def get_streaks(appid: Optional[int] = None):
-    db = SessionLocal()
+        # Convert summaries to dictionaries
+        return [{
+            'id': s.id,  # Add id
+            'new_games_count': s.new_games_count,  # Add new_games_count
+            'average_playtime_per_game': s.average_playtime_per_game,
+            'most_played_appid': s.most_played_appid,
+            'most_played_minutes': s.most_played_minutes,
+            'date': s.date.isoformat(),  # Ensure date is formatted as a string
+            'total_playtime_minutes': s.total_playtime_minutes,
+            'total_games_tracked': s.total_games_tracked,
+            'total_playtime_change': s.total_playtime_change,
+            'most_played_name': s.most_played_name
+        } for s in reversed(summaries)]
+    finally:
+        if close_after:
+            db.close()
+
+def get_streaks(appid: Optional[int] = None, session=None):
+    db = session or SessionLocal()
+    close_after = False
+    if session is None:
+        close_after = True
+
     try:
         # Get all daily summaries ordered by date
         summaries = db.query(DailySummary).order_by(DailySummary.date).all()
@@ -278,10 +324,15 @@ def get_streaks(appid: Optional[int] = None):
         current_streak = temp_streak
         return {"longest_streak": longest_streak, "current_streak": current_streak}
     finally:
-        db.close()
+        if close_after:
+            db.close()
 
-def compare_games(appids: List[int], start_date: Optional[date] = None, end_date: Optional[date] = None):
-    db = SessionLocal()
+def compare_games(appids: List[int], start_date: Optional[date] = None, end_date: Optional[date] = None, session=None):
+    db = session or SessionLocal()
+    close_after = False
+    if session is None:
+        close_after = True
+
     try:
         # Determine full date range
         if not start_date:
@@ -328,10 +379,15 @@ def compare_games(appids: List[int], start_date: Optional[date] = None, end_date
 
         return result
     finally:
-        db.close()
+        if close_after:
+            db.close()
 
-def activity_heatmap(limit_days: int = 90):
-    db = SessionLocal()
+def activity_heatmap(limit_days: int = 90, session=None):
+    db = session or SessionLocal()
+    close_after = False
+    if session is None:
+        close_after = True
+    
     today = date.today()
     start_date = today - timedelta(days=limit_days)
     try:
@@ -352,4 +408,5 @@ def activity_heatmap(limit_days: int = 90):
         ]
         return heatmap
     finally:
-        db.close()
+        if close_after:
+            db.close()

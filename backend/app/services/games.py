@@ -5,16 +5,23 @@ from backend.app.db.database import SessionLocal
 from backend.app.db.models import Game, Snapshot
 from datetime import datetime, timedelta, timezone
 
-def search_games(q: str):
-    db = SessionLocal()
+def search_games(q: str, session=None):
+    db = session or SessionLocal()
+    close_after = False
+    if session is None:
+        close_after = True
     try:
         games = db.query(Game).filter(Game.name.ilike(f"%{q}%")).all()
         return [{"appid": g.appid, "name": g.name, "img_icon_url": g.img_icon_url} for g in games]
     finally:
-        db.close()
+        if close_after:
+            db.close()
 
-def game_details(appid: int, days: int = 30):
-    db = SessionLocal()
+def game_details(appid: int, days: int = 30, session=None):
+    db = session or SessionLocal()
+    close_after = False
+    if session is None:
+        close_after = True
     try:
         game = db.query(Game).filter_by(appid=appid).first()
         if not game:
@@ -35,4 +42,5 @@ def game_details(appid: int, days: int = 30):
             "history": [{"date": s.date.isoformat(), "playtime_forever": s.playtime_forever} for s in snapshots]
         }
     finally:
-        db.close()
+        if close_after:
+            db.close()

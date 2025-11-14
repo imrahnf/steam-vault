@@ -38,6 +38,10 @@ This provides an extensible and production ready analytics service that anyone c
     - [Admin Protected Routes](#admin-protected-routes)
     - [Cron Protected Routes](#cron-protected-routes)
     - [Public Endpoints](#public-endpoints)
+  - [Demo Mode (Optional)](#demo-mode-optional)
+    - [How Demo Mode Works](#how-demo-mode-works)
+    - [Enabling Demo Endpoints](#enabling-demo-endpoints)
+    - [Demo Routes (`/demo/*`)](#demo-routes-demo)
   - [Installation \& Deployment](#installation--deployment)
     - [Environment Variables](#environment-variables)
       - [Required Variables](#required-variables)
@@ -192,6 +196,45 @@ Accessible without any tokens- fully public:
 - `/analytics/activity/heatmap`
 - `/analytics/games/compare`
 - `/games/*`
+
+## Demo Mode (Optional)
+SteamVault includes a **fully isolated demo environment** that exposes read only analytics using a separate SQLite database, found in [`/steamvault_demo.db`](/steamvault_demo.db)
+
+This is useful when you want to publicly showcase the API without exposing real Steam data.
+
+### How Demo Mode Works
+- The demo routes live under the prefix `/demo`
+- This uses a completely separate database defined in [`backend/app/db/demo_database.py`](backend/app/db/demo_database.py):
+  ```python
+  DATABASE_URL = "sqlite:///./steamvault_demo.db"
+  ```
+- A single `demo_session` is created per process
+- No writing occurs; all endpoints are readonly
+- If you do not need this, simply delete the demo router import as well as the demo database file.
+
+### Enabling Demo Endpoints
+In [`backend/app/main.py`](backend/app/main.py), demo mode is enabled by these lines:
+```python
+# DELETE THIS, demo purposes only
+from backend.app.routes.demo.demo_routes import demo_router 
+app.include_router(demo_router)
+```
+To disable demo mode for production, remove these lines.
+
+
+### Demo Routes (`/demo/*`)
+| Endpoint                           | Method | Description                            |
+| ---------------------------------- | ------ | -------------------------------------- |
+| `/demo/analytics/summary/latest`   | GET    | Latest daily summary (demo DB)         |
+| `/demo/analytics/summary/history`  | GET    | Historical summaries                   |
+| `/demo/analytics/top_games`        | GET    | Top games (week/month/lifetime)        |
+| `/demo/analytics/trends`           | GET    | 14-day trends                          |
+| `/demo/analytics/streaks`          | GET    | Play streaks (all games or per-game)   |
+| `/demo/analytics/activity/heatmap` | GET    | 90-day activity heatmap                |
+| `/demo/analytics/games/compare`    | GET    | Compare multiple games by `appid` list |
+| `/demo/games/search`               | GET    | Search games in demo DB                |
+| `/demo/games/{appid}`              | GET    | Game details + playtime preview        |
+
 
 ---
 

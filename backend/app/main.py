@@ -2,12 +2,12 @@
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException, Depends
-
-from backend.app.routes import fetch, analytics
-from backend.app.routes import games
-
+from backend.app.routes import fetch, analytics, games
 from backend.app.db.database import init_database
 from backend.app.security import verify_cron_token
+
+# DELETE THIS, demo purposes only
+from backend.app.routes.demo.demo_routes import demo_router 
 
 '''
     TODO: 
@@ -20,7 +20,7 @@ from backend.app.security import verify_cron_token
 
 load_dotenv()
 
-app = FastAPI(title="SteamVault", docs_url=None, redoc_url=None, openapi_url=None)
+app = FastAPI(title="SteamVault")#, docs_url=None, redoc_url=None, openapi_url=None)
 
 # Initialize db
 init_database()
@@ -28,8 +28,10 @@ init_database()
 # Setup routers
 app.include_router(fetch.router, prefix="/fetch", tags=["fetch"])
 app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
-
 app.include_router(games.router, prefix="/games", tags=["games"])
+
+# Demo routes only (delete)
+app.include_router(demo_router)
 
 @app.get("/")
 async def main():
