@@ -114,7 +114,7 @@ def get_latest_summary(session=None):
         if close_after:
             db.close()
 
-def get_top_games(period: str, page: int = 1, limit: int = 10, session=None):
+def get_top_games(period: str, page: int = 1, limit: int = 10, session=None, reference_date=None):
     db = session or SessionLocal()
     close_after = False
     if session is None:
@@ -129,7 +129,11 @@ def get_top_games(period: str, page: int = 1, limit: int = 10, session=None):
         return {"cached": True, **cached}
 
     try:
-        now = datetime.now(timezone.utc)
+        # Use reference_date for demo mode, otherwise current time
+        if reference_date:
+            now = datetime.combine(reference_date, datetime.min.time(), tzinfo=timezone.utc)
+        else:
+            now = datetime.now(timezone.utc)
         skip = (page - 1) * limit
 
         # Determine start date based on period
@@ -154,7 +158,7 @@ def get_top_games(period: str, page: int = 1, limit: int = 10, session=None):
 
             total = db.query(subq).count()
             results = (
-                db.query(Game.name, subq.c.delta_playtime)
+                db.query(Game.appid, Game.name, Game.img_icon_url, subq.c.delta_playtime)
                 .join(subq, subq.c.appid == Game.appid)
                 .order_by(subq.c.delta_playtime.desc())
                 .offset(skip)
@@ -174,7 +178,7 @@ def get_top_games(period: str, page: int = 1, limit: int = 10, session=None):
 
             total = db.query(subq).count()
             results = (
-                db.query(Game.name, subq.c.total_playtime)
+                db.query(Game.appid, Game.name, Game.img_icon_url, subq.c.total_playtime)
                 .join(subq, subq.c.appid == Game.appid)
                 .order_by(subq.c.total_playtime.desc())
                 .offset(skip)
@@ -182,10 +186,11 @@ def get_top_games(period: str, page: int = 1, limit: int = 10, session=None):
                 .all()
             )
 
-        # Format results
+        # Format results - filter out games with zero playtime
         top_games = [
-            {"name": r[0], "total_playtime": int(r[1] or 0)}
+            {"appid": r[0], "name": r[1], "img_icon_url": r[2], "total_playtime": int(r[3] or 0)}
             for r in results
+            if r[3] and int(r[3]) > 0
         ]
 
         response = {
@@ -206,7 +211,7 @@ def get_top_games(period: str, page: int = 1, limit: int = 10, session=None):
         if close_after:
             db.close()
 
-def get_trends(session=None):
+def get_trends(session=None, reference_date=None):
     db = session or SessionLocal()
     close_after = False
     if session is None:
@@ -220,7 +225,8 @@ def get_trends(session=None):
         return {"cached": True, "trends": cached}
 
     try:
-        now = date.today()
+        # Use reference_date for demo mode
+        now = reference_date if reference_date else date.today()
         week_ago = now - timedelta(days=7)
         two_weeks_ago = now - timedelta(days=14)
 
@@ -327,19 +333,22 @@ def get_streaks(appid: Optional[int] = None, session=None):
         if close_after:
             db.close()
 
-def compare_games(appids: List[int], start_date: Optional[date] = None, end_date: Optional[date] = None, session=None):
+def compare_games(appids: List[int], start_date: Optional[date] = None, end_date: Optional[date] = None, session=None, reference_date=None):
     db = session or SessionLocal()
     close_after = False
     if session is None:
         close_after = True
 
     try:
+        # Use reference_date for demo mode
+        today = reference_date if reference_date else date.today()
+        
         # Determine full date range
         if not start_date:
             # default to 90 days ago
-            start_date = date.today() - timedelta(days=90)
+            start_date = today - timedelta(days=90)
         if not end_date:
-            end_date = date.today()
+            end_date = today
 
         all_dates = [
             start_date + timedelta(days=i)
@@ -382,13 +391,14 @@ def compare_games(appids: List[int], start_date: Optional[date] = None, end_date
         if close_after:
             db.close()
 
-def activity_heatmap(limit_days: int = 90, session=None):
+def activity_heatmap(limit_days: int = 90, session=None, reference_date=None):
     db = session or SessionLocal()
     close_after = False
     if session is None:
         close_after = True
     
-    today = date.today()
+    # Use reference_date for demo mode
+    today = reference_date if reference_date else date.today()
     start_date = today - timedelta(days=limit_days)
     try:
         # get summaries

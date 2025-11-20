@@ -16,6 +16,9 @@ demo_router = APIRouter(prefix="/demo")
 # create a single demo session (could also create one per request)
 demo_session = SessionLocal()
 
+# Demo reference date - the "current date" for demo purposes
+DEMO_REFERENCE_DATE = date(2025, 11, 15)
+
 @demo_router.get("/analytics/summary/latest")
 async def demo_get_latest_summary():
     summary = analytics.get_latest_summary(session=demo_session)
@@ -29,7 +32,7 @@ async def get_top_games(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100)
     ):
-    result = analytics.get_top_games(period, page, limit, demo_session)
+    result = analytics.get_top_games(period, page, limit, demo_session, reference_date=DEMO_REFERENCE_DATE)
     if not result:
         raise HTTPException(status_code=404, detail="No data for that period.")
     return result
@@ -43,7 +46,7 @@ async def demo_summary_history( start_date: Optional[date] = None, end_date: Opt
 
 @demo_router.get("/analytics/trends")
 async def get_trends():
-    result = analytics.get_trends(demo_session)
+    result = analytics.get_trends(demo_session, reference_date=DEMO_REFERENCE_DATE)
     if not result:
         raise HTTPException(status_code=404, detail="Not enough data to show trends")
     return result
@@ -57,14 +60,14 @@ async def streaks(appid: Optional[int] = None):
 
 @demo_router.get("/analytics/activity/heatmap")
 async def activity_heatmap(limit_days: int = 90):
-    activity = analytics.activity_heatmap(limit_days, demo_session)
+    activity = analytics.activity_heatmap(limit_days, demo_session, reference_date=DEMO_REFERENCE_DATE)
     if not activity:
         raise HTTPException(status_code=404, detail="Not enough data available to see activity.")
     return activity
 
 @demo_router.get("/analytics/games/compare")
 async def compare_games( appids: List[int] = Query(...), start_date: Optional[date] = None, end_date: Optional[date] = None):
-    comparison = analytics.compare_games(appids, start_date, end_date, demo_session)
+    comparison = analytics.compare_games(appids, start_date, end_date, demo_session, reference_date=DEMO_REFERENCE_DATE)
     if not comparison:
         raise HTTPException(status_code=404, detail="Could not compare games.")
     return comparison
