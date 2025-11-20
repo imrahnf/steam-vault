@@ -2,20 +2,13 @@
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from backend.app.routes import fetch, analytics, games
 from backend.app.db.database import init_database
 from backend.app.security import verify_cron_token
 
 # DELETE THIS, demo purposes only
 from backend.app.routes.demo.demo_routes import demo_router 
-
-'''
-    TODO: 
-    - ADD CORS MIDDLEWERE
-        add local dev frontend origin
-        add deployed frontend
-    - DEVELOP FRONTEND
-'''
 
 load_dotenv()
 DEMO_MODE = os.getenv("DEMO_MODE", "0") == "1"
@@ -29,6 +22,18 @@ else:
     # Disable all docs
     app = FastAPI(title="SteamVault",docs_url=None,redoc_url=None,openapi_url=None)
 
+# CORS middleware for frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # Local frontend dev
+        "http://127.0.0.1:3000",
+        "https://imrahnf.github.io",  # GitHub Pages frontend
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Initialize db
 init_database()
