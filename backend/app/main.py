@@ -29,6 +29,8 @@ app.add_middleware(
         "http://localhost:3000",  # Local frontend dev
         "http://127.0.0.1:3000",
         "https://imrahnf.github.io",  # GitHub Pages frontend
+        "https://www.omrahnfaqiri.com",  # Root site (if needed elsewhere)
+        "https://steamvault.omrahnfaqiri.com"  # Custom domain for frontend
     ],
     allow_credentials=True,
     allow_methods=["*"],
