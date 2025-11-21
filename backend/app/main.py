@@ -26,11 +26,11 @@ else:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",  # Local frontend dev
+        "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://imrahnf.github.io",  # GitHub Pages frontend
-        "https://www.omrahnfaqiri.com",  # Root site (if needed elsewhere)
-        "https://steamvault.omrahnfaqiri.com"  # Custom domain for frontend
+        "https://imrahnf.github.io",
+        "https://www.omrahnfaqiri.com",
+        "https://steamvault.omrahnfaqiri.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -1,5 +1,5 @@
 # SteamVault
-![Python 3.12.7](https://img.shields.io/badge/Python-3.12.7-blue.svg) ![FastAPI](https://img.shields.io/badge/FastAPI-0.119.0-009688.svg?logo=fastapi) ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) ![Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?logo=render)
+![Python 3.12.7](https://img.shields.io/badge/Python-3.12.7-blue.svg) ![FastAPI](https://img.shields.io/badge/FastAPI-0.119.0-009688.svg?logo=fastapi) ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) ![Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?logo=render) ![Live Demo](https://img.shields.io/badge/Live_Demo-SteamVault-0A84FF?logo=google-chrome&logoColor=white)
 
 > **SteamVault** is a modular **backend analytics engine** and **REST API** that automatically tracks your Steam gaming activity.  
 It fetches daily playtime, stores historical snapshots, and generates rich analytics such as:
@@ -33,9 +33,19 @@ uvicorn backend.app.main:app --reload
 ```
 ---
 
+## 🚀 Live Demo (Frontend Dashboard)
+**A lightweight frontend dashboard is available here:**
+👉 **https://steamvault.omrahnfaqiri.com**
+
+This demo is powered by the public `/demo/*` analytics API is fully readonly. No Steam account required.
+
+---
+
+
 # Table of Contents
 - [SteamVault](#steamvault)
 - [Quick Start (Demo Mode)](#quick-start-demo-mode)
+  - [🚀 Live Demo (Frontend Dashboard)](#-live-demo-frontend-dashboard)
 - [Table of Contents](#table-of-contents)
     - [⭐ Why SteamVault?](#-why-steamvault)
     - [Key Features](#key-features)
