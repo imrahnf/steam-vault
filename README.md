@@ -16,6 +16,13 @@ It fetches daily playtime, stores historical snapshots, and generates rich analy
 This provides an extensible and production ready analytics service that anyone can build on.
 
 ---
+
+# 🚀 Live Demo (Frontend Dashboard)
+**A lightweight frontend dashboard is available here:**
+👉 **https://steamvault.omrahnfaqiri.com**
+
+This demo is powered by the public `/demo/*` analytics API is fully readonly. No Steam account required.
+
 # Quick Start (Demo Mode)
 ```bash
 git clone https://github.com/imrahnf/steam-vault
@@ -32,15 +39,6 @@ uvicorn backend.app.main:app --reload
 # Visit http://127.0.0.1:8000/docs
 ```
 ---
-
-## 🚀 Live Demo (Frontend Dashboard)
-**A lightweight frontend dashboard is available here:**
-👉 **https://steamvault.omrahnfaqiri.com**
-
-This demo is powered by the public `/demo/*` analytics API is fully readonly. No Steam account required.
-
----
-
 
 # Table of Contents
 - [SteamVault](#steamvault)
