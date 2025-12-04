@@ -17,7 +17,7 @@ This provides an extensible and production ready analytics service that anyone c
 
 ---
 
-# 🚀 Live Demo (Frontend Dashboard)
+# Live Demo (Frontend Dashboard)
 **A lightweight frontend dashboard is available here:**
 👉 **https://steamvault.omrahnfaqiri.com**
 
@@ -45,7 +45,7 @@ uvicorn backend.app.main:app --reload
 - [Quick Start (Demo Mode)](#quick-start-demo-mode)
   - [🚀 Live Demo (Frontend Dashboard)](#-live-demo-frontend-dashboard)
 - [Table of Contents](#table-of-contents)
-    - [⭐ Why SteamVault?](#-why-steamvault)
+    - [Why SteamVault?](#-why-steamvault)
     - [Key Features](#key-features)
   - [Tech Stack](#tech-stack)
   - [Project Structure](#project-structure)
@@ -84,7 +84,7 @@ uvicorn backend.app.main:app --reload
 
 ---
 
-### ⭐ Why SteamVault?
+### Why SteamVault?
 Steam shows lifetime playtime, but offers no **historical records** or analytics. SteamVault fills this gap by generating daily snapshots and summaries, enabling:
 - Daily snapshots.
 - Daily summaries.
